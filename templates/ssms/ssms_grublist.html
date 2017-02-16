@@ -30,6 +30,24 @@
 	<td>{{i.status}}</td>
 	<td>{{i.cg_id}}</td>
 	</tr>
+	 {% endfor %} 
+	{% for i in wear %}
+	<tr>
+	<td><a href="/ssms/ssms/grub/{{ i.gm_id }}/">{{i.name}}</a></td>
+	<td>{{i.date}}</td>
+	<td>{{i.deadline}}</td>
+	<td>{{i.status}}</td>
+	<td>{{i.cg_id}}</td>
+	</tr>
+	 {% endfor %} 
+	{% for i in event %}
+	<tr>
+	<td><a href="/ssms/ssms/grub/{{ i.gm_id }}/">{{i.name}}</a></td>
+	<td>{{i.date}}</td>
+	<td>{{i.deadline}}</td>
+	<td>{{i.status}}</td>
+	<td>{{i.cg_id}}</td>
+	</tr>
 	 {% endfor %}  
 </tbody>
 </table>

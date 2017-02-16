@@ -25,7 +25,7 @@ STATIC_PATH = os.path.join(BASE_DIR,'static')
 SECRET_KEY = 'y%(fr2hk01$g5fdi@!iuwu@nid)un_hy$-deyh%403poa6+l2c'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = False #True #False
+DEBUG = True #True #False
 
 ALLOWED_HOSTS = ['*']
 
@@ -82,7 +82,7 @@ WSGI_APPLICATION = 'project.wsgi.application'
 
 DATABASES = {
     'default': {
-	'ENGINE': 'django.db.backends.postgresql_psycopg2',  #sqlite3 #postgresql_psycopg2
+	'ENGINE': 'django.db.backends.sqlite3',  #sqlite3 #postgresql_psycopg2
         'NAME': 'dc2eakupqkiitn',
 	'USER' : 'cnjducipifmryw',
 	'PASSWORD' : 'z8jq1Z__sGITdYPtdFEoMGbrnh',

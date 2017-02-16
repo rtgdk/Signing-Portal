@@ -74,6 +74,89 @@ class Grub_Student(models.Model):
                 return self.student_id
 
 
+class Wear(models.Model):
+	mtype=(('T Shirt','T Shirt'),('Sweat Shirt','Sweat Shirt'))
+	stype=(('Active','Active'),('Inactive','Inactive'))
+	emtype=(('Sent','Sent'),('Not Sent','Not Sent'))
+	gm_id=  models.UUIDField("Wear UUID",primary_key=True, default=uuid.uuid4, editable=False)
+	name = models.CharField("Wear Name",max_length=32)
+	meal= models.CharField("Wear Type",choices=mtype,max_length=16,default='Veg')
+	cg_id= models.ForeignKey(Grub_Coord,verbose_name="Coordinator Id")
+	reg_date = models.DateTimeField("Registration Date",default=datetime.now, blank=False)	
+	date = models.DateField(default=datetime.now,blank=False)
+	deadline = models.DateField(default=datetime.now,blank=False)
+	deadline2 = models.DateField(default=datetime.now,blank=False)
+	status=models.CharField(choices=stype,max_length=128,default='Active')
+	excel = models.FileField(upload_to=content_album_name,blank=False)	
+	mails=models.CharField(choices=emtype,max_length=128,default='Not Sent',blank=False)
+	price = models.IntegerField("Wear Price",default=0,null=False)
+	image =  models.ImageField("Wear image",upload_to=content_album_name, blank=False)
+	def __str__(self):
+		return self.name
+
+
+
+class Wear_Student(models.Model):
+	unique_id = models.UUIDField("Unique Student Id",primary_key=True, default=uuid.uuid4, editable=False)
+	stype=(('Signed Up','Signed Up'),('Opted Out','Opted Out'))  
+	mtype=(('S','S'),('M','M'),('L','L'),('XL','XL'),('XXL','XXL'))
+	emtype=(('Sent','Sent'),('Not Sent','Not Sent'))
+	name = models.CharField(max_length=32)
+	student_id= models.CharField("Bits Id",max_length=32,blank=False)
+	user_id=models.CharField("Bits Email Id",db_index=True,max_length=32,blank=False)
+	gm_id = models.ForeignKey(Wear,default='1',verbose_name="Wear Id")
+	mail=models.CharField(choices=emtype,max_length=128,default='Not Sent',blank=False)
+	meal= models.CharField("Size Selected",choices=mtype,max_length=16,default='Veg',blank=False)
+	status=models.CharField(choices=stype,max_length=128,blank=False)
+	room=models.CharField("Room No.",max_length=32,default='303')
+	bhawan=models.CharField("Bhawan",max_length=32,default='VK')
+	class Meta:
+		unique_together = ('student_id', 'gm_id','status') ##add meal
+	def __str__(self):
+                return self.student_id
+
+class Event(models.Model):
+	mtype=(('Workshop','Workshop'),('Prof Shows','Prof Shows'))
+	stype=(('Active','Active'),('Inactive','Inactive'))
+	emtype=(('Sent','Sent'),('Not Sent','Not Sent'))
+	gm_id=  models.UUIDField("Event UUID",primary_key=True, default=uuid.uuid4, editable=False)
+	name = models.CharField("Event Name",max_length=32)
+	meal= models.CharField("Event Type",choices=mtype,max_length=16,default='Veg')
+	cg_id= models.ForeignKey(Grub_Coord,verbose_name="Coordinator Id")
+	reg_date = models.DateTimeField("Registration Date",default=datetime.now, blank=False)	
+	date = models.DateField(default=datetime.now,blank=False)
+	deadline = models.DateField(default=datetime.now,blank=False)
+	deadline2 = models.DateField(default=datetime.now,blank=False)
+	status=models.CharField(choices=stype,max_length=128,default='Active')
+	excel = models.FileField(upload_to=content_album_name,blank=False)	
+	mails=models.CharField(choices=emtype,max_length=128,default='Not Sent',blank=False)
+	price = models.IntegerField("Event Price",default=0,null=False)
+	image =  models.ImageField("Event image",upload_to=content_album_name, blank=False)
+	venue =  models.CharField("Event Venue",max_length=16,blank=False)
+	def __str__(self):
+		return self.name
+
+
+
+class Event_Student(models.Model):
+	unique_id = models.UUIDField("Unique Student Id",primary_key=True, default=uuid.uuid4, editable=False)
+	stype=(('Signed Up','Signed Up'),('Opted Out','Opted Out'))  
+	emtype=(('Sent','Sent'),('Not Sent','Not Sent'))
+	mtype=(('Workshop','Workshop'),('Prof Shows','Prof Shows'))
+	name = models.CharField(max_length=32)
+	student_id= models.CharField("Bits Id",max_length=32,blank=False)
+	user_id=models.CharField("Bits Email Id",db_index=True,max_length=32,blank=False)
+	gm_id = models.ForeignKey(Event,default='1',verbose_name="Event Id")
+	mail=models.CharField(choices=emtype,max_length=128,default='Not Sent',blank=False)
+	meal= models.CharField("Size Selected",choices=mtype,max_length=16,default='Veg',blank=False)
+	status=models.CharField(choices=stype,max_length=128,blank=False)
+	room=models.CharField("Room No.",max_length=32,default='303')
+	bhawan=models.CharField("Bhawan",max_length=32,default='VK')
+	class Meta:
+		unique_together = ('student_id', 'gm_id','status') ##add meal
+	def __str__(self):
+                return self.student_id
+                
 class Student(models.Model):
 	unique_id = models.UUIDField("Unique Stud Id",primary_key=True, default=uuid.uuid4, editable=False)
 	name = models.CharField(max_length=32)

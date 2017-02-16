@@ -1,5 +1,5 @@
 from django import forms
-from ssms.models import Grub,Grub_Coord,Grub_Student,Veg,NonVeg,Both
+from ssms.models import Grub,Grub_Coord,Grub_Student,Veg,NonVeg,Both,Wear,Event,Wear_Student,Event_Student
 from django.contrib.auth.models import User
 from django.contrib.admin import widgets 
 class Grub_CoordUserForm(forms.ModelForm):
@@ -96,5 +96,16 @@ class UploadFileForm(forms.Form):
 	class meta:
 		('file',)
 		
+class WearForm(forms.ModelForm):
+	#date=forms.DateField(help_text="Format: YYYY-MM-DD")
+	class Meta:
+	        model = Wear
+	        fields = ('name','meal','price','image')
+
+class EventForm(forms.ModelForm):
+	#date=forms.DateField(help_text="Format: YYYY-MM-DD")
+	class Meta:
+	        model = Event
+	        fields = ('name','meal','venue','price','image')
 
 
