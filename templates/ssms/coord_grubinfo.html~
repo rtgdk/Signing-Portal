@@ -84,7 +84,7 @@
                         </small>
                     	</h2>
 <h4 class="text-center">Image</h4>
-<img class="img-responsive img-full" src="{{ wear.url }} " alt="">
+<img class="img-responsive img-full" src="{{ wear.image.url }} " alt="">
 		</div>
 
 	<h3>Cancellations starts on {{ wear.deadline2 }}<h3>
@@ -96,7 +96,7 @@
 	{% ifequal e 4 %}
 	<h1 class="text-center text-danger">Signing is over</h1>
 	{% else %}
-	<h3 class="text-right"><a href="/ssms/coord/edit/{{grub.gm_id}}/"><button class="btn btn-lg btn-primary" >Edit</button></a></h3>
+	<h3 class="text-right"><a href="/ssms/coord/edit/{{wear.gm_id}}/"><button class="btn btn-lg btn-primary" >Edit</button></a></h3>
 	{% endifequal %}
 <ul>
 	
@@ -113,7 +113,7 @@
                         </small>
                     	</h2>
 <h4 class="text-center">Image</h4>
-<img class="img-responsive img-full" src="{{ event.url }} " alt="">
+<img class="img-responsive img-full" src="{{ event.image.url }} " alt="">
 		</div>
 
 	<h3>Cancellations starts on {{ event.deadline2 }}<h3>
@@ -125,7 +125,7 @@
 	{% ifequal e 4 %}
 	<h1 class="text-center text-danger">Signing is over</h1>
 	{% else %}
-	<h3 class="text-right"><a href="/ssms/coord/edit/{{grub.gm_id}}/"><button class="btn btn-lg btn-primary" >Edit</button></a></h3>
+	<h3 class="text-right"><a href="/ssms/coord/edit/{{event.gm_id}}/"><button class="btn btn-lg btn-primary" >Edit</button></a></h3>
 	{% endifequal %}
 <ul>
 	

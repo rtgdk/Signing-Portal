@@ -92,11 +92,11 @@
 	<h3  class="text-right"  >Status: {{wear.status}}</h3>
 		<h3>price: {{wear.price}}</h3>
 	
-	<h3><a href="/ssms/stats/{{grub.gm_id}}/"><button class="btn btn-lg btn-info" >View Stats</button></a></h3>
+	<h3><a href="/ssms/stats/{{wear.gm_id}}/"><button class="btn btn-lg btn-info" >View Stats</button></a></h3>
 	{% ifequal e 4 %}
 	<h1 class="text-center text-danger">Signing is over</h1>
 	{% else %}
-	<h3 class="text-right"><a href="/ssms/coord/edit/{{grub.gm_id}}/"><button class="btn btn-lg btn-primary" >Edit</button></a></h3>
+	<h3 class="text-right"><a href="/ssms/coord/edit/{{wear.gm_id}}/"><button class="btn btn-lg btn-primary" >Edit</button></a></h3>
 	{% endifequal %}
 <ul>
 	
@@ -121,11 +121,11 @@
 	<h3  class="text-right"  >Status: {{ event.status}}</h3>
 		<h3>price: {{event.price}}</h3>
 	
-	<h3><a href="/ssms/stats/{{grub.gm_id}}/"><button class="btn btn-lg btn-info" >View Stats</button></a></h3>
+	<h3><a href="/ssms/stats/{{event.gm_id}}/"><button class="btn btn-lg btn-info" >View Stats</button></a></h3>
 	{% ifequal e 4 %}
 	<h1 class="text-center text-danger">Signing is over</h1>
 	{% else %}
-	<h3 class="text-right"><a href="/ssms/coord/edit/{{grub.gm_id}}/"><button class="btn btn-lg btn-primary" >Edit</button></a></h3>
+	<h3 class="text-right"><a href="/ssms/coord/edit/{{event.gm_id}}/"><button class="btn btn-lg btn-primary" >Edit</button></a></h3>
 	{% endifequal %}
 <ul>
 	

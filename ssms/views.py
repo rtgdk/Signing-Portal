@@ -5,7 +5,7 @@ from django.http import HttpResponseRedirect, HttpResponse
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth import logout
 from ssms.models import Grub,Grub_Coord,Grub_Student,Veg,NonVeg,Both,Student,Wear,Event,Wear_Student,Event_Student
-from ssms.forms import GrubForm,Grub_CoordUserForm,Grub_CoordUserProfileForm,ExcelUpload,VegForm,NonVegForm,BothForm,CoordStudentRegForm, GrubFormEdit , UploadFileForm, WearForm,EventForm
+from ssms.forms import GrubForm,Grub_CoordUserForm,Grub_CoordUserProfileForm,ExcelUpload,VegForm,NonVegForm,BothForm,CoordStudentRegForm, GrubFormEdit , UploadFileForm, WearForm,EventForm, WearFormEdit, EventFormEdit,ExcelUpload2,ExcelUpload3 
 from django.conf import settings
 #addddddd
 from django import forms
@@ -253,7 +253,7 @@ def ssms_grubinfo(request,gmid):
 
 
 @cache_control(no_cache=True, must_revalidate=True, no_store=True)
-def ssms_grub_list(request):
+def ssms_grub_list(request): 
 	if request.user.is_superuser:
 		grub_list=Grub.objects.order_by('-date')[:]
 		wear_list=Wear.objects.order_by('-date')[:]
@@ -266,8 +266,8 @@ def ssms_grub_list(request):
 
 
 @cache_control(no_cache=True, must_revalidate=True, no_store=True)
-def ssms_student_table(request,gmid):
-	if request.user.is_superuser:
+def ssms_student_table(request,gmid): #Done
+	if request.user.is_superuser or request.user.is_staff:
 		try:
 			grub=Grub.objects.get(gm_id=gmid)
 			stud = Grub_Student.objects.filter(gm_id=gmid)
@@ -384,7 +384,7 @@ def ssms_coord_inactive(request,cgid):	##To be Done Later
 
 import os
 
-def export_data(request, gmid):
+def export_data(request, gmid): #Done
 	if request.user.is_staff:
 		if request.method == "POST":
 			try :
@@ -478,7 +478,7 @@ def export_data(request, gmid):
 					c = Event_Student.objects.filter(gm_id=gmid,status="Signed Up")
 				else :
 					c = Event_Student.objects.filter(gm_id=gmid,status="Signed Up",bhawan=bh)
-				a= Wear.objects.get(gm_id=gmid)
+				a= Event.objects.get(gm_id=gmid)
 		
 				b=[]		
 				for stu in c:
@@ -496,7 +496,7 @@ def export_data(request, gmid):
 				worksheet.write('A1', 'User ID', bold)
 				worksheet.write('B1', 'Name', bold)
 				worksheet.write('C1', 'BITS ID', bold)
-				worksheet.write('D1', 'Size', bold)
+				worksheet.write('D1', 'Type', bold)
 				worksheet.write('E1', 'Bhawan', bold)
 				worksheet.write('F1', 'Room No.', bold)
 				row = 1
@@ -523,7 +523,7 @@ def export_data(request, gmid):
 
 
 
-def coord_login(request):
+def coord_login(request):#DOne
 	context_dict={}
 	if request.method == 'POST':
 		username = request.POST.get('username')
@@ -693,7 +693,7 @@ def coord_grub_register(request):
 
 
 @cache_control(no_cache=True, must_revalidate=True, no_store=True)
-def coord_upload(request,gmid):
+def coord_upload(request,gmid): #Done
 	if request.user.is_staff and not request.user.is_superuser:
 		try :
 			grub =Grub.objects.get(gm_id=gmid)
@@ -780,6 +780,169 @@ def coord_upload(request,gmid):
 				return HttpResponseRedirect("/ssms")
 		except Grub.DoesNotExist:
 			pass
+		try :
+			grub =Wear.objects.get(gm_id=gmid)
+			form = ExcelUpload2(instance=grub)
+			#e=datechecker(gmid)
+			e=2
+			coord = Grub_Coord.objects.get(cg_name=grub.cg_id)
+			if request.user == coord.user:
+				if (e==2 or e==4):
+					if request.method == 'POST' and request.FILES:
+						b=request.FILES['excel']
+						filename=str(b.name)
+						if filename.endswith('.xls') or filename.endswith('.xlsx') or filename.endswith('.csv'):
+							a = Wear.objects.get(gm_id=gmid)
+							d=Wear.objects.filter(gm_id=gmid)[0]
+			
+							form = ExcelUpload2(request.POST,request.FILES,instance=grub)
+							if form.is_valid():
+						   		photo=form.save(commit=False)
+								if 'excel' in request.FILES :
+									def choice_func(row):
+										a=row[0]
+										a=str(a).upper()[:11]
+										try :
+											b=Student.objects.get(bits_id=str(a))
+											smailid=b.user_id
+											sname=b.name
+											sbhawan=b.bhawan
+											sroom=b.room_no
+											row.append(smailid)
+											row.append(sname)
+											row.append(sbhawan)
+											row.append(sroom)
+										except :
+											if a[4]=="H" or a[4]=="P":
+												smailid=a[4]+a[0:4]+a[8:11]
+												sname="User"
+												sbhawan="Not Specified"
+												sroom="Not Specified"
+												row.append(smailid)
+												row.append(sname)
+												row.append(sbhawan)
+												row.append(sroom)
+											else :
+												smailid="f"+a[0:4]+a[8:11]
+												sname="User"
+												sbhawan="Not Specified"
+												sroom="Not Specified"
+												row.append(smailid)
+												row.append(sname)
+												row.append(sbhawan)
+												row.append(sroom)
+											row[1]=str(row[1]).upper()
+										row.append("Signed Up")
+										row.append(d)
+									    	return row
+									files=request.FILES['excel']
+									files.save_to_database(
+									model=Wear_Student,
+									initializer=choice_func,
+									mapdict=[ 'student_id','meal','user_id','name','bhawan', 'room','status','gm_id']
+								    	)
+							    		photo.excel = files
+									photo.save()
+									return HttpResponseRedirect("/ssms/stats/"+gmid)
+							else:
+								print form.errors
+						else :
+					
+							invalid="Unsupported File type."
+							return render(request, 'ssms/coord_upload.html', {'form': form,'grub':grub,"e":e,"invalid":invalid})
+		
+					else:
+				
+						form = ExcelUpload2(instance=grub)
+			
+					return render(request, 'ssms/coord_upload.html', {'form': form,'grub':grub,"e":e})
+				else:
+					return render(request, 'ssms/coord_upload.html', {"e":e})
+			else:
+				return HttpResponseRedirect("/ssms")
+		except Wear.DoesNotExist:
+			pass
+		try :
+			grub =Event.objects.get(gm_id=gmid)
+			form = ExcelUpload3(instance=grub)
+			#e=datechecker(gmid)
+			e=2
+			coord = Grub_Coord.objects.get(cg_name=grub.cg_id)
+			if request.user == coord.user:
+				if (e==2 or e==4):
+					if request.method == 'POST' and request.FILES:
+						b=request.FILES['excel']
+						filename=str(b.name)
+						if filename.endswith('.xls') or filename.endswith('.xlsx') or filename.endswith('.csv'):
+							a = Event.objects.get(gm_id=gmid)
+							d=Event.objects.filter(gm_id=gmid)[0]
+			
+							form = ExcelUpload3(request.POST,request.FILES,instance=grub)
+							if form.is_valid():
+						   		photo=form.save(commit=False)
+								if 'excel' in request.FILES :
+									def choice_func(row):
+										a=row[0]
+										a=str(a).upper()[:11]
+										try :
+											b=Student.objects.get(bits_id=str(a))
+											smailid=b.user_id
+											sname=b.name
+											sbhawan=b.bhawan
+											sroom=b.room_no
+											row.append(smailid)
+											row.append(sname)
+											row.append(sbhawan)
+											row.append(sroom)
+										except :
+											if a[4]=="H" or a[4]=="P":
+												smailid=a[4]+a[0:4]+a[8:11]
+												sname="User"
+												sbhawan="Not Specified"
+												sroom="Not Specified"
+												row.append(smailid)
+												row.append(sname)
+												row.append(sbhawan)
+												row.append(sroom)
+											else :
+												smailid="f"+a[0:4]+a[8:11]
+												sname="User"
+												sbhawan="Not Specified"
+												sroom="Not Specified"
+												row.append(smailid)
+												row.append(sname)
+												row.append(sbhawan)
+												row.append(sroom)
+											row[1]=str(row[1]).upper()
+										row.append("Signed Up")
+										row.append(d)
+									    	return row
+									files=request.FILES['excel']
+									files.save_to_database(
+									model=Event_Student,
+									initializer=choice_func,
+									mapdict=[ 'student_id','meal','user_id','name','bhawan', 'room','status','gm_id']
+								    	)
+							    		photo.excel = files
+									photo.save()
+									return HttpResponseRedirect("/ssms/stats/"+gmid)
+							else:
+								print form.errors
+						else :
+					
+							invalid="Unsupported File type."
+							return render(request, 'ssms/coord_upload.html', {'form': form,'grub':grub,"e":e,"invalid":invalid})
+		
+					else:
+				
+						form = ExcelUpload3(instance=grub)
+					return render(request, 'ssms/coord_upload.html', {'form': form,'grub':grub,"e":e})
+				else:
+					return render(request, 'ssms/coord_upload.html', {"e":e})
+			else:
+				return HttpResponseRedirect("/ssms")
+		except Event.DoesNotExist:
+			pass
 			return HttpResponseRedirect("/ssms")
 	else :
 			return HttpResponseRedirect('/ssms/coord/login/')
@@ -787,7 +950,7 @@ def coord_upload(request,gmid):
 
 
 @cache_control(no_cache=True, must_revalidate=True, no_store=True)
-def coord_student_register(request,gmid):
+def coord_student_register(request,gmid): # Not to be Done
 	if request.user.is_staff and not request.user.is_superuser:
 		try :
 			grub =Grub.objects.get(gm_id=gmid)
@@ -845,7 +1008,7 @@ def coord_student_register(request,gmid):
 		return HttpResponseRedirect('/ssms/coord/login/')
 
 @cache_control(no_cache=True, must_revalidate=True, no_store=True)
-def coord_view_grub(request,gmid):
+def coord_view_grub(request,gmid): # Done
 	if request.user.is_staff and not request.user.is_superuser:
 		try :
 			grub =Grub.objects.get(gm_id=gmid)
@@ -868,6 +1031,7 @@ def coord_view_grub(request,gmid):
 					context_dict['meal'] = b
 					context_dict['i'] = i
 					context_dict['e']=e
+					return render(request, 'ssms/coord_grubinfo.html', context_dict)
 				except Grub.DoesNotExist:
 					pass
 			else:
@@ -916,7 +1080,7 @@ def coord_view_grub(request,gmid):
 
 
 @cache_control(no_cache=True, must_revalidate=True, no_store=True)
-def coord_grub_edit(request,gmid):  # To Be Done
+def coord_grub_edit(request,gmid):  # Done
 	if request.user.is_staff and not request.user.is_superuser:
 		try :
 			grub =Grub.objects.get(gm_id=gmid)
@@ -926,7 +1090,6 @@ def coord_grub_edit(request,gmid):  # To Be Done
 			if request.user == coord.user:
 				done=0
 				inst = Grub.objects.get(gm_id=gmid)
-				grub=Grub.objects.get(gm_id=gmid)
 				if request.method == 'POST':
 					form = GrubFormEdit(request.POST, instance=inst)		
 					if form.is_valid():
@@ -941,6 +1104,52 @@ def coord_grub_edit(request,gmid):  # To Be Done
 			else:
 				return HttpResponseRedirect("/ssms")
 		except Grub.DoesNotExist:
+			pass
+		try :
+			grub =Wear.objects.get(gm_id=gmid)
+			#e=datechecker(gmid)
+			e=2
+			coord = Grub_Coord.objects.get(cg_name=grub.cg_id)
+			if request.user == coord.user:
+				done=0
+				inst = Wear.objects.get(gm_id=gmid)
+				if request.method == 'POST':
+					form = WearFormEdit(request.POST, instance=inst)		
+					if form.is_valid():
+						grub=form.save(commit=False)
+						grub.save()
+						done=1		
+				   	else:
+						print form.errors
+				else:
+					form = WearFormEdit(instance=inst)		
+				return render(request, 'ssms/coord_grub_edit.html', {'form': form,'done':done,'grub':grub})
+			else:
+				return HttpResponseRedirect("/ssms")
+		except Wear.DoesNotExist:
+			pass
+		try :
+			grub =Event.objects.get(gm_id=gmid)
+			#e=datechecker(gmid)
+			e=2
+			coord = Grub_Coord.objects.get(cg_name=grub.cg_id)
+			if request.user == coord.user:
+				done=0
+				inst = Event.objects.get(gm_id=gmid)
+				if request.method == 'POST':
+					form = EventFormEdit(request.POST, instance=inst)		
+					if form.is_valid():
+						grub=form.save(commit=False)
+						grub.save()
+						done=1		
+				   	else:
+						print form.errors
+				else:
+					form = EventFormEdit(instance=inst)		
+				return render(request, 'ssms/coord_grub_edit.html', {'form': form,'done':done,'grub':grub})
+			else:
+				return HttpResponseRedirect("/ssms")
+		except Wear.DoesNotExist:
 			pass
 			return HttpResponseRedirect("/ssms")
 	else :
@@ -973,13 +1182,13 @@ def student_login(request):
 
 """
 @cache_control(no_cache=True, must_revalidate=True, no_store=True)
-def student_upcoming_grubs(request):
+def student_upcoming_grubs(request): # Done
 	if request.user.is_authenticated() and not request.user.is_staff:
 		c = date.today()
 		grub_list=Grub.objects.filter(status="Active").order_by('-date')[:]
 		wear_list=Wear.objects.filter(status="Active").order_by('-date')[:]
 		event_list=Event.objects.filter(status="Active").order_by('-date')[:]
-		context_dict={"grub":grub_list,"wear":wear_list,"event":event_list,"coord":coord_list}
+		context_dict={"grub":grub_list,"wear":wear_list,"event":event_list}
 		return render(request, 'ssms/student_grublist.html',context_dict)
 	else :
 		return HttpResponseRedirect("/ssms/")
@@ -1015,6 +1224,43 @@ def student_grub_register(request, gmid):		#To Be Done
 			context_dict['e']=e
 	    	except Grub.DoesNotExist:
 			pass
+			try:
+				grub = Wear.objects.get(gm_id=gmid,status="Active")
+				try :
+					a = Wear_Student.objects.get(gm_id=gmid,user_id=str(request.user))
+					b = a.meal
+					context_dict['meal'] = b
+					context_dict['student']= a
+				except Wear_Student.DoesNotExist:
+					pass
+				#e=datechecker(gmid)
+				e=2
+				i=3
+				context_dict['i'] = i
+				context_dict['grub'] = grub
+				context_dict['e']=e
+				return render(request, 'ssms/student_grubinfo.html', context_dict)
+			except Wear.DoesNotExist:
+				pass
+			try:
+				grub = Event.objects.get(gm_id=gmid,status="Active")
+				try :
+					a = Event_Student.objects.get(gm_id=gmid,user_id=str(request.user))
+					b = a.meal
+					context_dict['meal'] = b
+					context_dict['student']= a
+				except Event_Student.DoesNotExist:
+					pass
+				#e=datechecker(gmid)
+				e=2
+				i=3
+				context_dict['i'] = i
+				context_dict['grub'] = grub
+				context_dict['e']=e
+				return render(request, 'ssms/student_grubinfo.html', context_dict)
+			except Wear.DoesNotExist:
+				pass
+				return HttpResponseRedirect('/ssms/')
 	    	return render(request, 'ssms/student_grubinfo.html', context_dict)
 	else :
 		return render(request, 'ssms/student_grubinfo.html', context_dict)

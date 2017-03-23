@@ -56,6 +56,7 @@ class CoordStudentRegForm(forms.ModelForm):
 	class Meta:
 	        model = Grub_Student
 		fields = ('student_id',)
+
 class ExcelUpload(forms.ModelForm):
 	"""def clean(self):	
 		files = self.cleaned_data['excel']
@@ -71,6 +72,36 @@ class ExcelUpload(forms.ModelForm):
 	class Meta:
 	        model = Grub
 	        fields = ('excel',)
+class ExcelUpload2(forms.ModelForm):
+	"""def clean(self):	
+		files = self.cleaned_data['excel']
+		if files:
+            		filename = files.name
+            		print filename
+            		if filename.endswith('.xls') or filename.endswith('.xlsx') or filename.endswith('.csv'):
+                		return files
+           		else:
+                		raise forms.ValidationError("Unsupported File type.")
+
+        	return files"""
+	class Meta:
+	        model = Wear
+	        fields = ('excel',)
+class ExcelUpload3(forms.ModelForm):
+	"""def clean(self):	
+		files = self.cleaned_data['excel']
+		if files:
+            		filename = files.name
+            		print filename
+            		if filename.endswith('.xls') or filename.endswith('.xlsx') or filename.endswith('.csv'):
+                		return files
+           		else:
+                		raise forms.ValidationError("Unsupported File type.")
+
+        	return files"""
+	class Meta:
+	        model = Event
+	        fields = ('excel',)
 
 
 class GrubFormEdit(forms.ModelForm):
@@ -78,8 +109,15 @@ class GrubFormEdit(forms.ModelForm):
 	        model = Grub
 	        fields = ('name',)
 
+class WearFormEdit(forms.ModelForm):
+	class Meta:
+	        model = Wear
+	        fields = ('name',)
 
-
+class EventFormEdit(forms.ModelForm):
+	class Meta:
+	        model = Event
+	        fields = ('name',)    
 class UploadFileForm(forms.Form):
 	file = forms.FileField()
 	def clean(self):

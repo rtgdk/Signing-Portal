@@ -23,16 +23,29 @@
 </thead>
 <tbody>
 	{% for i in grub %}
-	{% if i.date|timesince >= "1 day" %}
-	{% else %}
 	<tr>
 	<td><a href="/ssms/student/grub/{{ i.gm_id }}/">{{i.name}}</a></td>
 	<td>{{i.date}}</td>
 	<td>{{i.deadline}}</td>
 	<td>{{i.meal}}</td>
 	</tr>
-	{% endif %}
 	{% endfor %}  
+	{% for i in wear %}
+	<tr>
+	<td><a href="/ssms/student/grub/{{ i.gm_id }}/">{{i.name}}</a></td>
+	<td>{{i.date}}</td>
+	<td>{{i.deadline}}</td>
+	<td>{{i.meal}}</td>
+	</tr>
+	{% endfor %}
+	{% for i in event %}
+	<tr>
+	<td><a href="/ssms/student/grub/{{ i.gm_id }}/">{{i.name}}</a></td>
+	<td>{{i.date}}</td>
+	<td>{{i.deadline}}</td>
+	<td>{{i.meal}}</td>
+	</tr>
+	{% endfor %}
 </tbody>
 </table>
 {% else %}
