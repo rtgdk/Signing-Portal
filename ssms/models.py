@@ -80,7 +80,7 @@ class Wear(models.Model):
 	emtype=(('Sent','Sent'),('Not Sent','Not Sent'))
 	gm_id=  models.UUIDField("Wear UUID",primary_key=True, default=uuid.uuid4, editable=False)
 	name = models.CharField("Wear Name",max_length=32)
-	meal= models.CharField("Wear Type",choices=mtype,max_length=16,default='Veg')
+	meal= models.CharField("Wear Type",choices=mtype,max_length=16,default='T Shirt')
 	cg_id= models.ForeignKey(Grub_Coord,verbose_name="Coordinator Id")
 	reg_date = models.DateTimeField("Registration Date",default=datetime.now, blank=False)	
 	date = models.DateField(default=datetime.now,blank=False)
@@ -148,7 +148,7 @@ class Event_Student(models.Model):
 	user_id=models.CharField("Bits Email Id",db_index=True,max_length=32,blank=False)
 	gm_id = models.ForeignKey(Event,default='1',verbose_name="Event Id")
 	mail=models.CharField(choices=emtype,max_length=128,default='Not Sent',blank=False)
-	meal= models.CharField("Size Selected",choices=mtype,max_length=16,default='Veg',blank=False)
+	meal= models.CharField("Size Selected",choices=mtype,max_length=16,default='Workshop',blank=False)
 	status=models.CharField(choices=stype,max_length=128,blank=False)
 	room=models.CharField("Room No.",max_length=32,default='303')
 	bhawan=models.CharField("Bhawan",max_length=32,default='VK')
@@ -196,4 +196,10 @@ class Both(models.Model):
 	non_veg_images = models.ImageField("Non Veg Image",upload_to=content_album_name2, blank=False)	
 	def __str__(self):
                 return self.gm_id.name
+
+class DateMailStatus(models.Model):
+	date = models.DateField(default=datetime.now,blank=False)
+	mails = models.IntegerField("Mails Sent",default = 0)
+	def __str__(self):
+		return self.date.strftime('%m/%d/%Y')
 
