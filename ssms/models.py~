@@ -197,3 +197,9 @@ class Both(models.Model):
 	def __str__(self):
                 return self.gm_id.name
 
+class DateMailStatus(models.Model):
+	date = models.DateField(default=datetime.now,blank=False)
+	mails = models.IntegerField("Mails Sent",default = 0)
+	def __str__(self):
+		return self.date.strftime('%m/%d/%Y')
+

@@ -82,7 +82,7 @@ class Wear(models.Model):
 	name = models.CharField("Wear Name",max_length=32)
 	meal= models.CharField("Wear Type",choices=mtype,max_length=16,default='T Shirt')
 	cg_id= models.ForeignKey(Grub_Coord,verbose_name="Coordinator Id")
-	reg_date = models.DateTimeField("Registration Date",default=datetime.now, blank=False)	
+	reg_date = models.DateTimeField("Final Submission Date",default=datetime.now, blank=False)	
 	date = models.DateField(default=datetime.now,blank=False)
 	deadline = models.DateField(default=datetime.now,blank=False)
 	deadline2 = models.DateField(default=datetime.now,blank=False)

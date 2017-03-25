@@ -25,16 +25,14 @@ def datechecker(gmid):
 	try:
 		grub = Grub.objects.get(gm_id=gmid)
 	except: 
-		pass
-	try:
-		grub = Wear.objects.get(gm_id=gmid)
-	except: 
-		pass
-	try:
-		grub = Event.objects.get(gm_id=gmid)
-	except: 
-		pass
-		return HttpResponse("Error")
+		try:
+			grub = Wear.objects.get(gm_id=gmid)
+		except: 
+			try:
+				grub = Event.objects.get(gm_id=gmid)
+			except: 
+				pass
+				return HttpResponse("Error")
 	c=date.today()
 	d=0
 	if (grub.deadline2>c):     # coord reg open
@@ -1006,8 +1004,7 @@ def coord_upload(request,gmid): #Done
 		try :
 			grub =Grub.objects.get(gm_id=gmid)
 			form = ExcelUpload(instance=grub)
-			#e=datechecker(gmid)
-			e=2
+			e=datechecker(gmid)
 			coord = Grub_Coord.objects.get(cg_name=grub.cg_id)
 			if request.user == coord.user:
 				if (e==2 or e==4):
@@ -1560,8 +1557,7 @@ def student_grub_register(request, gmid):		#To Be Done
 				context_dict['student']= a
 			except Grub_Student.DoesNotExist:
 				pass
-			#e=datechecker(gmid)
-			e=2
+			e=datechecker(gmid)
 			context_dict['grub'] = grub
 			context_dict['meal'] = b
 			context_dict['i'] = i
@@ -1577,8 +1573,8 @@ def student_grub_register(request, gmid):		#To Be Done
 					context_dict['student']= a
 				except Wear_Student.DoesNotExist:
 					pass
-				#e=datechecker(gmid)
-				e=2
+				e=datechecker(gmid)
+				print(e)
 				context_dict['wear'] = grub
 				context_dict['e']=e
 				return render(request, 'ssms/student_grubinfo.html', context_dict)
@@ -1593,8 +1589,7 @@ def student_grub_register(request, gmid):		#To Be Done
 					context_dict['student']= a
 				except Event_Student.DoesNotExist:
 					pass
-				#e=datechecker(gmid)
-				e=2
+				e=datechecker(gmid)
 				context_dict['event'] = grub
 				context_dict['e']=e
 				return render(request, 'ssms/student_grubinfo.html', context_dict)
@@ -1661,13 +1656,13 @@ def student_grub_register4(request, gmid):                 #register for wear,ev
 		try:
 			grub = Wear.objects.get(gm_id=gmid,status="Active")
 			d=datechecker(gmid)
-			e=2
 			if (d==1 or d==2) :
+				print("here2")
 				a = Wear.objects.filter(gm_id=gmid)[0]
 				d= Student.objects.get(user_id=str(request.user))
 				try :
 					b=Wear_Student.objects.get(gm_id=gmid,user_id=str(request.user))
-					b.meal="Non Veg"
+					b.meal=request.POST['size']
 					b.status="Signed Up"
 					b.save()
 				except Wear_Student.DoesNotExist:
@@ -1681,7 +1676,6 @@ def student_grub_register4(request, gmid):                 #register for wear,ev
 		try:
 			grub = Event.objects.get(gm_id=gmid,status="Active")
 			d=datechecker(gmid)
-			e=2
 			if (d==1 or d==2) :
 				a = Event.objects.filter(gm_id=gmid)[0]
 				d= Student.objects.get(user_id=str(request.user))
@@ -1706,8 +1700,7 @@ def student_grub_cancel(request, gmid):				#Done
 	if request.user.is_authenticated() and not request.user.is_staff:
 		try:
 			grub = Grub.objects.get(gm_id=gmid,status="Active")
-			#d=datechecker(gmid)
-			e=2
+			d=datechecker(gmid)
 			if d==1 :
 				try :
 					a=Grub_Student.objects.get(gm_id=gmid,user_id=str(request.user))
@@ -1722,8 +1715,7 @@ def student_grub_cancel(request, gmid):				#Done
 			pass
 		try:
 			grub = Wear.objects.get(gm_id=gmid,status="Active")
-			#d=datechecker(gmid)
-			e=2
+			d=datechecker(gmid)
 			if d==1 :
 				try :
 					a=Wear_Student.objects.get(gm_id=gmid,user_id=str(request.user))
@@ -1738,8 +1730,7 @@ def student_grub_cancel(request, gmid):				#Done
 			pass
 		try:
 			grub = Event.objects.get(gm_id=gmid,status="Active")
-			#d=datechecker(gmid)
-			e=2
+			d=datechecker(gmid)
 			if d==1 :
 				try :
 					a=Event_Student.objects.get(gm_id=gmid,user_id=str(request.user))

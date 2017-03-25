@@ -43,7 +43,7 @@
 	
 	<h3>Cancellations start on {{ grub.deadline2 }}<h3>
 	<h3 >Cancellations Deadline: {{grub.deadline}}</h3>
-	<h3  class="text-right"  >Status: {{grub.status}}</h3>
+	
 	
 	{% ifequal i 0 %}
 		<h3>veg price: {{meal.v_price}}</h3>
@@ -161,10 +161,9 @@
 	
 	<h3>Cancellations start on {{ wear.deadline2 }}<h3>
 	<h3 >Cancellations Deadline: {{wear.deadline}}</h3>
-	<h3  class="text-right"  >Status: {{wear.status}}</h3>
+	
 	
 		<h3>price: {{wear.price}}</h3>
-		<h3>venue: {{wear.venue}}</h3>
 
 
 	
@@ -176,9 +175,9 @@
 	
 	{% ifequal student.status "Signed Up" %}
 	<h3>Status: {{ student.status }}</h3>
-	<h3>Registered For : {{ student.meal }}</h3>
+	<h3>Registered For Size: {{ student.meal }}</h3>
 {% ifequal e 1 %}
-	<h1><a href='/ssms/student/grub/{{ grub.gm_id }}/cancel/' >Cancel</a></h1>
+	<h1><a href='/ssms/student/grub/{{ wear.gm_id }}/cancel/' >Cancel</a></h1>
 	<div class="text-right">
 
 {% endifequal %}
@@ -206,17 +205,50 @@
 {% endifequal %}
 {% ifequal e 1 %}
 
-	<h1><a href='/ssms/student/grub/{{ wear.gm_id }}/register/signup/' ><button class="btn btn-lg btn-success" onClick="return confirm('Are you sure you want to Register For Veg in {{ wear.name }}?');">Register For </button></a></h1>
+	<h1><button class="btn btn-lg btn-success" data-toggle="modal" data-target="#myWear">Register</button></h1>
 
 {% endifequal %}
 {% ifequal e 2 %}
-	<h1><a href='/ssms/student/grub/{{ wear.gm_id }}/register/signup/' ><button class="btn btn-lg btn-success" onClick="return confirm('Are you sure you want to Register For Veg in {{ wear.name }}?');">Register For Veg</button></a></h1>
-
-	
-
+	<h1><button class="btn btn-lg btn-success" data-toggle="modal" data-target="#myWear">Register</button></h1>
 {% endifequal %}
-</div>
 
+</div>
+<div id="myWear" class="modal fade" role="dialog">
+  <div class="modal-dialog">
+
+    <!-- Modal content-->
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal">&times;</button>
+        <h4 class="modal-title">Choose your size</h4>
+      </div>
+      <div class="modal-body">
+        <form name="myForm" class = "form-horizontal" method = "post" action = '/ssms/student/grub/{{ wear.gm_id }}/register/signup/'>
+        {% csrf_token %}
+        <div class = "form-group">
+					<div class="col-sm-12">
+						<label class="control-label col-sm-2">Size </label>
+							<div class="col-sm-10"> 
+					        <select class="form-control" name = "size" id="size">
+					        <option value="S">S</option>
+					        <option value="M">M</option>
+					        <option value= "L">L</option>
+					        <option value="XL">XL</option>
+					        <option value="XXL">XXL</option>
+					        <option value="XXXL">XXXL</option>
+					        </select>
+					        </div>
+					</div>
+				</div>
+      </div>
+      <div class="form-group text-center">
+			        <button type="submit"  class="btn btn-success">Submit</button>
+		</div>
+	</form>
+    </div>
+
+  </div>
+</div>
 	{% endifequal %}
 {% else %}
 <h3> Wear does not exist or has been made inactive.</h3>
@@ -245,7 +277,7 @@
 	
 	<h3>Cancellations start on {{ event.deadline2 }}<h3>
 	<h3 >Cancellations Deadline: {{event.deadline}}</h3>
-	<h3  class="text-right"  >Status: {{event.status}}</h3>
+	
 	
 		<h3>price: {{event.price}}</h3>
 		<h3>venue: {{event.venue}}</h3>
@@ -290,11 +322,11 @@
 {% endifequal %}
 {% ifequal e 1 %}
 
-	<h1><a href='/ssms/student/grub/{{ event.gm_id }}/register/signup/' ><button class="btn btn-lg btn-success" onClick="return confirm('Are you sure you want to Register For Veg in {{ event.name }}?');">Register For </button></a></h1>
+	<h1><a href='/ssms/student/grub/{{ event.gm_id }}/register/signup/' ><button class="btn btn-lg btn-success" onClick="return confirm('Are you sure you want to Register for {{ event.name }}?');">Register</button></a></h1>
 
 {% endifequal %}
 {% ifequal e 2 %}
-	<h1><a href='/ssms/student/grub/{{ event.gm_id }}/register/signup/' ><button class="btn btn-lg btn-success" onClick="return confirm('Are you sure you want to Register For Veg in {{ event.name }}?');">Register For Veg</button></a></h1>
+	<h1><a href='/ssms/student/grub/{{ event.gm_id }}/register/signup/' ><button class="btn btn-lg btn-success" onClick="return confirm('Are you sure you want to Register for {{ event.name }}?');">Register</button></a></h1>
 
 	
 
