@@ -4,7 +4,7 @@ from django.contrib.auth import authenticate, login
 from django.http import HttpResponseRedirect, HttpResponse
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth import logout
-from ssms.models import Grub,Grub_Coord,Grub_Student,Veg,NonVeg,Both,Student,Wear,Event,Wear_Student,Event_Student,DateMailStatus
+from ssms.models import Grub,Grub_Coord,Grub_Student,Veg,NonVeg,Both,Student,Wear,Event,Wear_Student,Event_Student
 from ssms.forms import GrubForm,Grub_CoordUserForm,Grub_CoordUserProfileForm,ExcelUpload,VegForm,NonVegForm,BothForm,CoordStudentRegForm, GrubFormEdit , UploadFileForm, WearForm,EventForm, WearFormEdit, EventFormEdit,ExcelUpload2,ExcelUpload3 
 from django.conf import settings
 #addddddd
@@ -22,17 +22,7 @@ import xlsxwriter
 
 
 def datechecker(gmid):
-	try:
-		grub = Grub.objects.get(gm_id=gmid)
-	except: 
-		try:
-			grub = Wear.objects.get(gm_id=gmid)
-		except: 
-			try:
-				grub = Event.objects.get(gm_id=gmid)
-			except: 
-				pass
-				return HttpResponse("Error")
+	grub = Grub.objects.get(gm_id=gmid)
 	c=date.today()
 	d=0
 	if (grub.deadline2>c):     # coord reg open
@@ -131,272 +121,7 @@ def send2(request):
 	return HttpResponse("Sent python mail" + str(b) )
 	
 	    
-def ssms_grub_sendmail1(request,gmid):
-	grubid = request.GET.get('grubid')
-	datemail = DateMailStatus.objects.get(date=datetime.now())
-	print(gmid)
-	try:
-		grub = Grub.objects.get(name=str(grubid))
-		print(gmid)
-		d = datetime.strptime(str(grub.date), '%Y-%m-%d')
-		e = date.strftime(d, "%d %B %Y")
-		v = datetime.strptime(str(grub.deadline), '%Y-%m-%d')
-		h = date.strftime(v, "%d %B %Y")
-		abcd=Grub_Student.objects.filter(gm_id=grub.gm_id,status="Signed Up",mail="Not Sent")
-		print e
-		print h
-		k=len(abcd)//99
-		count=0
-		for q in range(k+1):
-			a=[]
-			students=abcd[q*99:(q+1)*99] 
-			for j in students:
-				a.append(str(j.user_id)+"@pilani.bits-pilani.ac.in")
-				j.mail = "Sent"
-				j.save()
-			print a
-			subject, from_email = str(grub.name), 'ssms.pilani@gmail.com'
-			text_content = 'This is an important message.'
-			html_content = "<body><p>This is to inform you that you have been signed up for the <strong> "+str(grub.name)+"</strong> that is to take place on <strong>"+ e +"</strong> </p> <p>In case you wish to cancel your signing, please visit <a href=http://grub.ssms-pilani.org/ssms/student/grub/"+str(grub.gm_id)+"/ >SSMS Grub Portal</a>, before 12 midnight,<strong>" + h +"</strong>. Any requests made after the deadline will not be entertained. </p><p>If you receive your stub even after cancellation, do not give it to anybody else; please return it to the SSMS office in FD II with your name and ID number written on the back. Else, your cancellation will be treated as invalid. </p><p>Thank you.</p><p>Grub Committee, SSMS</p></body>"
-			msg = EmailMultiAlternatives(subject, text_content, from_email, cc = a, bcc=["f2014623@pilani.bits-pilani.ac.in", "f2015040@pilani.bits-pilani.ac.in"])
-			msg.attach_alternative(html_content, "text/html")
-			print a
-			try :
-				msg.send(fail_silently=False)
-				count=count + len(a)
-				datemail.mails = datemail.mails+len(a)
-				datemail.save()
-			except :
-				for j in students:
-					j.mail = "Not Sent"
-					j.save()
-				left = len(abcd)-count
-				data ={'is_taken': "Only "+str(count)+" mails were sent succesfully. " + str(left) +" mails are left to be send." }
-				return JsonResponse(data)
-		grub.mails="Sent"
-		grub.save()
-		print(gmid)
-		data = {'is_taken': "All the mails ("+ str(len(abcd)) +") were sent succesfully"}
-		return JsonResponse(data)
-	except :
-		pass
-	try:
-		grub = Wear.objects.get(name=str(grubid))
-		print(gmid)
-		d = datetime.strptime(str(grub.date), '%Y-%m-%d')
-		e = date.strftime(d, "%d %B %Y")
-		v = datetime.strptime(str(grub.deadline), '%Y-%m-%d')
-		h = date.strftime(v, "%d %B %Y")
-		abcd=Wear_Student.objects.filter(gm_id=grub.gm_id,status="Signed Up",mail="Not Sent")
-		print e
-		print h
-		k=len(abcd)//99
-		count=0
-		for q in range(k+1):
-			a=[]
-			students=abcd[q*99:(q+1)*99] 
-			for j in students:
-				a.append(str(j.user_id)+"@pilani.bits-pilani.ac.in")
-				j.mail = "Sent"
-				j.save()
-			print a
-			subject, from_email = str(grub.name), 'ssms.pilani@gmail.com'
-			text_content = 'This is an important message.'
-			html_content = "<body><p>This is to inform you that you have been signed up for the <strong> "+str(grub.name)+"</strong> that is to take place on <strong>"+ e +"</strong> </p> <p>In case you wish to cancel your signing, please visit <a href=http://grub.ssms-pilani.org/ssms/student/grub/"+str(grub.gm_id)+"/ >SSMS Grub Portal</a>, before 12 midnight,<strong>" + h +"</strong>. Any requests made after the deadline will not be entertained. </p><p>If you receive your stub even after cancellation, do not give it to anybody else; please return it to the SSMS office in FD II with your name and ID number written on the back. Else, your cancellation will be treated as invalid. </p><p>Thank you.</p><p>Grub Committee, SSMS</p></body>"
-			msg = EmailMultiAlternatives(subject, text_content, from_email, cc = a, bcc=["f2014623@pilani.bits-pilani.ac.in", "f2015040@pilani.bits-pilani.ac.in"])
-			msg.attach_alternative(html_content, "text/html")
-			print a
-			try :
-				msg.send(fail_silently=False)
-				count=count + len(a)
-				datemail.mails = datemail.mails+len(a)
-				datemail.save()
-			except :
-				for j in students:
-					j.mail = "Not Sent"
-					j.save()
-				left = len(abcd)-count
-				data ={'is_taken': "Only "+str(count)+" mails were sent succesfully. " + str(left) +" mails are left to be send." }
-				return JsonResponse(data)
-		grub.mails="Sent"
-		grub.save()
-		print(gmid)
-		data = {'is_taken': "All the mails ("+ str(len(abcd)) +") were sent succesfully"}
-		return JsonResponse(data)
-	except :
-		pass
-	try:
-		grub = Event.objects.get(name=str(grubid))
-		print(gmid)
-		d = datetime.strptime(str(grub.date), '%Y-%m-%d')
-		e = date.strftime(d, "%d %B %Y")
-		v = datetime.strptime(str(grub.deadline), '%Y-%m-%d')
-		h = date.strftime(v, "%d %B %Y")
-		abcd=Event_Student.objects.filter(gm_id=grub.gm_id,status="Signed Up",mail="Not Sent")
-		print e
-		print h
-		k=len(abcd)//99
-		count=0
-		for q in range(k+1):
-			a=[]
-			students=abcd[q*99:(q+1)*99] 
-			for j in students:
-				a.append(str(j.user_id)+"@pilani.bits-pilani.ac.in")
-				j.mail = "Sent"
-				j.save()
-			print a
-			subject, from_email = str(grub.name), 'ssms.pilani@gmail.com'
-			text_content = 'This is an important message.'
-			html_content = "<body><p>This is to inform you that you have been signed up for the <strong> "+str(grub.name)+"</strong> that is to take place on <strong>"+ e +"</strong> </p> <p>In case you wish to cancel your signing, please visit <a href=http://grub.ssms-pilani.org/ssms/student/grub/"+str(grub.gm_id)+"/ >SSMS Grub Portal</a>, before 12 midnight,<strong>" + h +"</strong>. Any requests made after the deadline will not be entertained. </p><p>If you receive your stub even after cancellation, do not give it to anybody else; please return it to the SSMS office in FD II with your name and ID number written on the back. Else, your cancellation will be treated as invalid. </p><p>Thank you.</p><p>Grub Committee, SSMS</p></body>"
-			msg = EmailMultiAlternatives(subject, text_content, from_email, cc = a, bcc=["f2014623@pilani.bits-pilani.ac.in", "f2015040@pilani.bits-pilani.ac.in"])
-			msg.attach_alternative(html_content, "text/html")
-			print a
-			try :
-				msg.send(fail_silently=False)
-				count=count + len(a)
-				datemail.mails = datemail.mails+len(a)
-				datemail.save()
-			except :
-				for j in students:
-					j.mail = "Not Sent"
-					j.save()
-				left = len(abcd)-count
-				data ={'is_taken': "Only "+str(count)+" mails were sent succesfully. " + str(left) +" mails are left to be send." }
-				return JsonResponse(data)
-		grub.mails="Sent"
-		grub.save()
-		print(gmid)
-		data = {'is_taken': "All the mails ("+ str(len(abcd)) +") were sent succesfully"}
-		return JsonResponse(data)
-	except :
-		print("here")
-		data = {'is_taken': "Internal Error"}
-		return JsonResponse(data)
 
-def ssms_grub_sendmail2(request,gmid):
-	grubid = request.GET.get('grubid')
-	datemail = DateMailStatus.objects.get(date=datetime.now())
-	print(gmid)
-	try:
-		grub = Grub.objects.get(name=str(grubid))
-		print(gmid)
-		if (grub.meal=="Veg"):
-			veg = Veg.objects.get(gm_id=grub.gm_id)
-			meal = str(veg.v_venue)
-		elif (grub.meal=="Non Veg"):
-			veg = NonVeg.objects.get(gm_id=grub.gm_id)
-			meal = str(veg.n_venue)
-		else :
-			veg = Veg.objects.get(gm_id=grub.gm_id)
-			veg2 = NonVeg.objects.get(gm_id=grub.gm_id)
-			meal = str(veg.v_venue) + " and " + str(veg2.n_venue)
-		d = datetime.strptime(str(grub.date), '%Y-%m-%d')
-		e = date.strftime(d, "%d %B %Y")
-		abcd=Grub_Student.objects.filter(gm_id=grub.gm_id,status="Signed Up")
-		print e
-		k=len(abcd)//99
-		count=0
-		for q in range(k+1):
-			a=[]
-			students=abcd[q*99:(q+1)*99] 
-			for j in students:
-				a.append(str(j.user_id)+"@pilani.bits-pilani.ac.in")
-				j.mail = "Sent2"
-				j.save()
-			print a
-			subject, from_email = str(grub.name) + " (Reminder)", 'ssms.pilani@gmail.com'
-			text_content = 'This is an important message.'
-			html_content = "<body><p>This is to remind you that you that you have been signed up for <strong> "+str(grub.name)+"</strong> which will take place on <strong>"+ e +"</strong> at the <strong>"+meal+"</strong> Mess. </p> <p>Wristbands for the same are available at your mess counter, and you are requested to collect the same if you haven't already.</p><strong><p>Entry into the grub shall not be allowed if you are not wearing the wristband.</p></strong><p>Limited on spot signings will be available. Please carry your ID cards for the same. </p><p>Thank you.</p><p>Grub Committee, SSMS</p></body>"
-			print a
-			msg = EmailMultiAlternatives(subject, text_content, from_email, cc = a, bcc=["f2014623@pilani.bits-pilani.ac.in", "f2015040@pilani.bits-pilani.ac.in"])
-			msg.attach_alternative(html_content, "text/html")
-			try :
-				msg.send(fail_silently=False)
-				count = count + len(a)
-				datemail.mails = datemail.mails+len(a)
-				datemail.save()
-			except :
-				for j in students:
-					j.mail = "Sent"
-					j.save()
-				left = len(abcd)-count
-				data ={'is_taken': "Only "+str(count)+" mails were sent succesfully. " + str(left) +" mails are left to be send." }
-				return JsonResponse(data)
-		grub.mails="Sent"
-		grub.save()
-		print(gmid)
-		data = {'is_taken': "All the mails ("+ str(len(abcd)) +") were sent succesfully"}
-		return JsonResponse(data)
-	except :
-		print("here")
-		data = {'is_taken': "Internal Error"}
-		return JsonResponse(data)
-	
-	    
-def ssms_grub_sendmail(request,gmid):
-	context_dict={}
-	try:
-		grub = Grub.objects.get(gm_id=gmid)
-		context_dict["grub"]=grub
-		stud = Grub_Student.objects.filter(gm_id=gmid,status="Signed Up")
-		registered=len(stud)
-		print("here")
-		context_dict["registered"]=registered
-		if(DateMailStatus.objects.filter(date=datetime.now()).exists()):
-			print("here3")
-			datemail = DateMailStatus.objects.get(date=datetime.now())
-			context_dict["datemail"]=datemail
-		else :
-			print("here2")
-			datemail = DateMailStatus.objects.create(date=datetime.now(),mails=0)
-			context_dict["datemail"]=datemail
-		mailsleft = 1000 - datemail.mails
-		context_dict["mailsleft"]=mailsleft
-		return render(request,'ssms/ssms_grub_sendmail.html',context_dict)
-	except:
-		pass
-	try:
-		grub = Wear.objects.get(gm_id=gmid)
-		context_dict["grub"]=grub
-		stud = Wear_Student.objects.filter(gm_id=gmid,status="Signed Up")
-		registered=len(stud)
-		print("here")
-		context_dict["registered"]=registered
-		if(DateMailStatus.objects.filter(date=datetime.now()).exists()):
-			print("here")
-			datemail = DateMailStatus.objects.get(date=datetime.now())
-			context_dict["datemail"]=datemail
-		else :
-			print("here2")
-			datemail = DateMailStatus.objects.create(date=datetime.now(),mails=0)
-			context_dict["datemail"]=datemail
-		mailsleft = 1000 - datemail.mails
-		context_dict["mailsleft"]=mailsleft
-		return render(request,'ssms/ssms_grub_sendmail.html',context_dict)
-	except:
-		pass
-	try:
-		grub = Event.objects.get(gm_id=gmid)
-		context_dict["grub"]=grub
-		stud = Event_Student.objects.filter(gm_id=gmid,status="Signed Up")
-		registered=len(stud)
-		print("here")
-		context_dict["registered"]=registered
-		if(DateMailStatus.objects.filter(date=datetime.now()).exists()):
-			print("here")
-			datemail = DateMailStatus.objects.get(date=datetime.now())
-			context_dict["datemail"]=datemail
-		else :
-			print("here2")
-			datemail = DateMailStatus.objects.create(date=datetime.now(),mails=0)
-			context_dict["datemail"]=datemail
-		mailsleft = 1000 - datemail.mails
-		context_dict["mailsleft"]=mailsleft
-		return render(request,'ssms/ssms_grub_sendmail.html',context_dict)
-	except:
-		pass	
-		return HttpResponseRedirect('/ssms/')
-	return render(request,'ssms/ssms_grub_sendmail.html',context_dict)
 	
 	
 def index(request): #Done
@@ -1004,7 +729,8 @@ def coord_upload(request,gmid): #Done
 		try :
 			grub =Grub.objects.get(gm_id=gmid)
 			form = ExcelUpload(instance=grub)
-			e=datechecker(gmid)
+			#e=datechecker(gmid)
+			e=2
 			coord = Grub_Coord.objects.get(cg_name=grub.cg_id)
 			if request.user == coord.user:
 				if (e==2 or e==4):
@@ -1574,8 +1300,8 @@ def student_grub_register(request, gmid):		#To Be Done
 					context_dict['student']= a
 				except Wear_Student.DoesNotExist:
 					pass
-				e=datechecker(gmid)
-				print(e)
+				#e=datechecker(gmid)
+				e=2
 				context_dict['wear'] = grub
 				context_dict['e']=e
 				return render(request, 'ssms/student_grubinfo.html', context_dict)
@@ -1590,7 +1316,8 @@ def student_grub_register(request, gmid):		#To Be Done
 					context_dict['student']= a
 				except Event_Student.DoesNotExist:
 					pass
-				e=datechecker(gmid)
+				#e=datechecker(gmid)
+				e=2
 				context_dict['event'] = grub
 				context_dict['e']=e
 				return render(request, 'ssms/student_grubinfo.html', context_dict)
@@ -1630,7 +1357,7 @@ def student_grub_register3(request, gmid):                 #register for non veg
 	if request.user.is_authenticated() and not request.user.is_staff:
 		try:
 			grub = Grub.objects.get(gm_id=gmid,status="Active")
-			d=datechecker(gmid)
+			#d=datechecker(gmid)
 			e=2
 			if (d==1 or d==2) :
 				a = Grub.objects.filter(gm_id=gmid)[0]
@@ -1656,14 +1383,14 @@ def student_grub_register4(request, gmid):                 #register for wear,ev
 	if request.user.is_authenticated() and not request.user.is_staff:
 		try:
 			grub = Wear.objects.get(gm_id=gmid,status="Active")
-			d=datechecker(gmid)
+			#d=datechecker(gmid)
+			e=2
 			if (d==1 or d==2) :
-				print("here2")
 				a = Wear.objects.filter(gm_id=gmid)[0]
 				d= Student.objects.get(user_id=str(request.user))
 				try :
 					b=Wear_Student.objects.get(gm_id=gmid,user_id=str(request.user))
-					b.meal=request.POST['size']
+					b.meal="Non Veg"
 					b.status="Signed Up"
 					b.save()
 				except Wear_Student.DoesNotExist:
@@ -1676,13 +1403,14 @@ def student_grub_register4(request, gmid):                 #register for wear,ev
 			pass
 		try:
 			grub = Event.objects.get(gm_id=gmid,status="Active")
-			d=datechecker(gmid)
+			#d=datechecker(gmid)
+			e=2
 			if (d==1 or d==2) :
 				a = Event.objects.filter(gm_id=gmid)[0]
 				d= Student.objects.get(user_id=str(request.user))
 				try :
 					b=Event_Student.objects.get(gm_id=gmid,user_id=str(request.user))
-					b.meal="Prof Show"
+					b.meal="Non Veg"
 					b.status="Signed Up"
 					b.save()
 				except Event_Student.DoesNotExist:
@@ -1701,7 +1429,8 @@ def student_grub_cancel(request, gmid):				#Done
 	if request.user.is_authenticated() and not request.user.is_staff:
 		try:
 			grub = Grub.objects.get(gm_id=gmid,status="Active")
-			d=datechecker(gmid)
+			#d=datechecker(gmid)
+			e=2
 			if d==1 :
 				try :
 					a=Grub_Student.objects.get(gm_id=gmid,user_id=str(request.user))
@@ -1716,7 +1445,8 @@ def student_grub_cancel(request, gmid):				#Done
 			pass
 		try:
 			grub = Wear.objects.get(gm_id=gmid,status="Active")
-			d=datechecker(gmid)
+			#d=datechecker(gmid)
+			e=2
 			if d==1 :
 				try :
 					a=Wear_Student.objects.get(gm_id=gmid,user_id=str(request.user))
@@ -1731,7 +1461,8 @@ def student_grub_cancel(request, gmid):				#Done
 			pass
 		try:
 			grub = Event.objects.get(gm_id=gmid,status="Active")
-			d=datechecker(gmid)
+			#d=datechecker(gmid)
+			e=2
 			if d==1 :
 				try :
 					a=Event_Student.objects.get(gm_id=gmid,user_id=str(request.user))

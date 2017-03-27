@@ -25,7 +25,7 @@ STATIC_PATH = os.path.join(BASE_DIR,'static')
 SECRET_KEY = 'y%(fr2hk01$g5fdi@!iuwu@nid)un_hy$-deyh%403poa6+l2c'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = False #True #False
+DEBUG = True #True #False
 
 ALLOWED_HOSTS = ['*']
 
@@ -92,20 +92,6 @@ DATABASES = {
     }
 	
 }
-"""
-        DATABASES = {
-    'default': {
-	'ENGINE': 'django.db.backends.postgresql_psycopg2',  #sqlite3 #postgresql_psycopg2
-        'NAME': 'dr8aqo5iubm3t',
-	'USER' : 'jejbloegqrfbph',
-	'PASSWORD' : 'qr_vxBeNnpe7jAy43DwdArVYiB',
-	'HOST' : 'ec2-54-243-201-3.compute-1.amazonaws.com',
-	'PORT' : '5432',
-	
-    }
-	
-}
-"""
 # Password validation
 # https://docs.djangoproject.com/en/1.9/ref/settings/#auth-password-validators
 
@@ -246,9 +232,9 @@ DEFAULT_FROM_EMAIL = EMAIL_HOST_USER
 
 # aws
 
-AWS_STORAGE_BUCKET_NAME = 'ssmsbits2'
-AWS_ACCESS_KEY_ID = 'AKIAII5HB4SOT3RMQUOA'#os.environ['AWS_ACCESS_KEY_ID']
-AWS_SECRET_ACCESS_KEY = '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' #os.environ['AWS_SECRET_ACCESS_KEY'] #
+AWS_STORAGE_BUCKET_NAME = ''
+AWS_ACCESS_KEY_ID = ''#os.environ['AWS_ACCESS_KEY_ID']
+AWS_SECRET_ACCESS_KEY = '' #os.environ['AWS_SECRET_ACCESS_KEY'] #
 
 # Tell django-storages that when coming up with the URL for an item in S3 storage, keep
 # it simple - just use this domain plus the path. (If this isn't set, things get complicated).

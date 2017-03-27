@@ -6,9 +6,9 @@ admin.site.register(Grub_Coord)
 admin.site.register(Veg)
 admin.site.register(NonVeg)
 admin.site.register(Both)
-
+admin.site.register(Student)
 admin.site.register(Wear)
-admin.site.register(DateMailStatus)
+
 admin.site.register(Event)
 
 class GrubStudentAdmin(admin.ModelAdmin):
